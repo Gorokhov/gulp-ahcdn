@@ -13,9 +13,13 @@ var PluginError = function(error){
 
 var ahcdnCacheReset = function(config,files){
 
-    throw PluginError('network error');
+    if(!files.length){
+        throw PluginError('network error');
+    }
 
-    var files = files.join("\n");
+    if(!config.username || !config.resourceId || !config.password){
+        throw PluginError('network error');
+    }
 
 
     return through.obj(function(file, enc, cb) {
@@ -27,7 +31,7 @@ var ahcdnCacheReset = function(config,files){
                     'sendImmediately': false
                 },
                 qs:{
-                    bulk:files,
+                    bulk:files.join("\n"),
                     source:config.resourceId,
                     respond:"json"
                 }
@@ -51,7 +55,7 @@ var ahcdnCacheReset = function(config,files){
                 }
 
                 gutil.colors.green("Successfully reset cache, server response:"+
-                chalk.blue(response.confirms))
+                chalk.blue(response.confirms[0]));
                 cb(null, file);
             }
         );
